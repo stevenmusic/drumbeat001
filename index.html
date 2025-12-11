@@ -788,133 +788,228 @@ T2:   -   x   -   x`,
         // Audio Context
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-        // Create highly realistic drum sounds using advanced synthesis
+        // Create authentic acoustic jazz drum sounds
         function playDrum(drumType) {
             const now = audioContext.currentTime;
             
             if (drumType === 'snare') {
-                // SNARE: Realistic snare with multiple layers
-                // Layer 1: Tone component (shell resonance)
-                const osc1 = audioContext.createOscillator();
-                const osc2 = audioContext.createOscillator();
-                osc1.type = 'triangle';
-                osc2.type = 'triangle';
-                osc1.frequency.setValueAtTime(185, now);
-                osc1.frequency.exponentialRampToValueAtTime(90, now + 0.1);
-                osc2.frequency.setValueAtTime(330, now);
-                osc2.frequency.exponentialRampToValueAtTime(180, now + 0.1);
+                // ACOUSTIC SNARE - Traditional jazz snare with natural resonance
+                
+                // 1. Drum shell fundamental (wood body resonance)
+                const fundamental = audioContext.createOscillator();
+                fundamental.type = 'sine';
+                fundamental.frequency.setValueAtTime(200, now);
+                fundamental.frequency.exponentialRampToValueAtTime(180, now + 0.05);
+                fundamental.frequency.exponentialRampToValueAtTime(160, now + 0.15);
+                
+                // 2. Second harmonic (shell mode)
+                const harmonic2 = audioContext.createOscillator();
+                harmonic2.type = 'sine';
+                harmonic2.frequency.setValueAtTime(330, now);
+                harmonic2.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+                
+                // 3. Third harmonic (higher overtone)
+                const harmonic3 = audioContext.createOscillator();
+                harmonic3.type = 'sine';
+                harmonic3.frequency.setValueAtTime(480, now);
+                harmonic3.frequency.exponentialRampToValueAtTime(440, now + 0.08);
                 
                 const toneGain = audioContext.createGain();
-                toneGain.gain.setValueAtTime(0.4, now);
-                toneGain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                toneGain.gain.setValueAtTime(0.5, now);
+                toneGain.gain.setValueAtTime(0.4, now + 0.01);
+                toneGain.gain.exponentialRampToValueAtTime(0.1, now + 0.08);
+                toneGain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
                 
-                osc1.connect(toneGain);
-                osc2.connect(toneGain);
+                fundamental.connect(toneGain);
+                harmonic2.connect(toneGain);
+                harmonic3.connect(toneGain);
                 
-                // Layer 2: Snare wires (high frequency noise)
-                const noise = audioContext.createBufferSource();
-                const noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.3, audioContext.sampleRate);
-                const noiseData = noiseBuffer.getChannelData(0);
-                for (let i = 0; i < noiseBuffer.length; i++) {
-                    noiseData[i] = (Math.random() * 2 - 1) * Math.exp(-i / audioContext.sampleRate * 8);
+                // 4. Snare wires (metal rattling sound)
+                const wireNoise = audioContext.createBufferSource();
+                const wireBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.25, audioContext.sampleRate);
+                const wireData = wireBuffer.getChannelData(0);
+                
+                // Generate metallic noise with specific characteristics
+                for (let i = 0; i < wireBuffer.length; i++) {
+                    const decay = Math.exp(-i / audioContext.sampleRate * 10);
+                    wireData[i] = (Math.random() * 2 - 1) * decay;
                 }
-                noise.buffer = noiseBuffer;
+                wireNoise.buffer = wireBuffer;
                 
-                const noiseFilter = audioContext.createBiquadFilter();
-                noiseFilter.type = 'highpass';
-                noiseFilter.frequency.value = 2000;
-                noiseFilter.Q.value = 1;
+                // High-pass for wire brightness
+                const wireHP = audioContext.createBiquadFilter();
+                wireHP.type = 'highpass';
+                wireHP.frequency.value = 1500;
+                wireHP.Q.value = 0.5;
                 
-                const noiseFilter2 = audioContext.createBiquadFilter();
-                noiseFilter2.type = 'bandpass';
-                noiseFilter2.frequency.value = 3500;
-                noiseFilter2.Q.value = 2;
+                // Band-pass for wire character
+                const wireBP = audioContext.createBiquadFilter();
+                wireBP.type = 'bandpass';
+                wireBP.frequency.value = 4000;
+                wireBP.Q.value = 1.5;
                 
-                const noiseGain = audioContext.createGain();
-                noiseGain.gain.setValueAtTime(0.8, now);
-                noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                const wireGain = audioContext.createGain();
+                wireGain.gain.setValueAtTime(0.7, now);
+                wireGain.gain.exponentialRampToValueAtTime(0.2, now + 0.1);
+                wireGain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
                 
-                noise.connect(noiseFilter);
-                noiseFilter.connect(noiseFilter2);
-                noiseFilter2.connect(noiseGain);
+                wireNoise.connect(wireHP);
+                wireHP.connect(wireBP);
+                wireBP.connect(wireGain);
                 
-                // Connect to output
+                // 5. Stick attack (transient)
+                const attackNoise = audioContext.createBufferSource();
+                const attackBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.02, audioContext.sampleRate);
+                const attackData = attackBuffer.getChannelData(0);
+                for (let i = 0; i < attackBuffer.length; i++) {
+                    attackData[i] = (Math.random() * 2 - 1) * (1 - i / attackBuffer.length);
+                }
+                attackNoise.buffer = attackBuffer;
+                
+                const attackFilter = audioContext.createBiquadFilter();
+                attackFilter.type = 'lowpass';
+                attackFilter.frequency.value = 3000;
+                
+                const attackGain = audioContext.createGain();
+                attackGain.gain.setValueAtTime(0.6, now);
+                attackGain.gain.exponentialRampToValueAtTime(0.01, now + 0.02);
+                
+                attackNoise.connect(attackFilter);
+                attackFilter.connect(attackGain);
+                
+                // Room ambience
+                const reverb = audioContext.createGain();
+                reverb.gain.value = 0.15;
+                
+                toneGain.connect(reverb);
+                wireGain.connect(reverb);
+                attackGain.connect(reverb);
+                
                 toneGain.connect(audioContext.destination);
-                noiseGain.connect(audioContext.destination);
+                wireGain.connect(audioContext.destination);
+                attackGain.connect(audioContext.destination);
+                reverb.connect(audioContext.destination);
                 
-                osc1.start(now);
-                osc2.start(now);
-                noise.start(now);
-                osc1.stop(now + 0.15);
-                osc2.stop(now + 0.15);
-                noise.stop(now + 0.3);
+                fundamental.start(now);
+                harmonic2.start(now);
+                harmonic3.start(now);
+                wireNoise.start(now);
+                attackNoise.start(now);
+                
+                fundamental.stop(now + 0.2);
+                harmonic2.stop(now + 0.15);
+                harmonic3.stop(now + 0.12);
+                wireNoise.stop(now + 0.25);
+                attackNoise.stop(now + 0.02);
                 
             } else if (drumType === 'tom1' || drumType === 'tom2' || drumType === 'tom3') {
-                // TOMS: Realistic tom with rich harmonics
-                const freqs = {tom1: 220, tom2: 160, tom3: 110};
-                const baseFreq = freqs[drumType];
+                // ACOUSTIC TOMS - Wooden shell with natural resonance
+                const baseFreqs = {tom1: 220, tom2: 165, tom3: 110};
+                const baseFreq = baseFreqs[drumType];
                 
-                // Multiple oscillators for rich harmonic content
-                const osc1 = audioContext.createOscillator();
-                const osc2 = audioContext.createOscillator();
-                const osc3 = audioContext.createOscillator();
+                // 1. Fundamental frequency (drumhead)
+                const fundamental = audioContext.createOscillator();
+                fundamental.type = 'sine';
+                fundamental.frequency.setValueAtTime(baseFreq, now);
+                fundamental.frequency.exponentialRampToValueAtTime(baseFreq * 0.85, now + 0.1);
+                fundamental.frequency.exponentialRampToTime(baseFreq * 0.75, now + 0.3);
+                fundamental.frequency.exponentialRampToValueAtTime(baseFreq * 0.65, now + 0.5);
                 
-                osc1.type = 'sine';
-                osc2.type = 'sine';
-                osc3.type = 'triangle';
+                // 2. Second mode (first overtone)
+                const overtone1 = audioContext.createOscillator();
+                overtone1.type = 'sine';
+                overtone1.frequency.setValueAtTime(baseFreq * 1.6, now);
+                overtone1.frequency.exponentialRampToValueAtTime(baseFreq * 1.4, now + 0.15);
+                overtone1.frequency.exponentialRampToValueAtTime(baseFreq * 1.2, now + 0.35);
                 
-                // Fundamental and harmonics
-                osc1.frequency.setValueAtTime(baseFreq, now);
-                osc1.frequency.exponentialRampToValueAtTime(baseFreq * 0.4, now + 0.5);
+                // 3. Third mode (second overtone)
+                const overtone2 = audioContext.createOscillator();
+                overtone2.type = 'sine';
+                overtone2.frequency.setValueAtTime(baseFreq * 2.3, now);
+                overtone2.frequency.exponentialRampToValueAtTime(baseFreq * 2.0, now + 0.12);
+                overtone2.frequency.exponentialRampToValueAtTime(baseFreq * 1.7, now + 0.25);
                 
-                osc2.frequency.setValueAtTime(baseFreq * 1.5, now);
-                osc2.frequency.exponentialRampToValueAtTime(baseFreq * 0.6, now + 0.4);
+                // 4. Shell resonance (wood body)
+                const shellResonance = audioContext.createOscillator();
+                shellResonance.type = 'triangle';
+                shellResonance.frequency.setValueAtTime(baseFreq * 0.8, now);
+                shellResonance.frequency.exponentialRampToValueAtTime(baseFreq * 0.6, now + 0.4);
                 
-                osc3.frequency.setValueAtTime(baseFreq * 2.2, now);
-                osc3.frequency.exponentialRampToValueAtTime(baseFreq * 0.8, now + 0.3);
-                
-                // Attack noise for stick impact
-                const noise = audioContext.createBufferSource();
-                const noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.05, audioContext.sampleRate);
-                const noiseData = noiseBuffer.getChannelData(0);
-                for (let i = 0; i < noiseBuffer.length; i++) {
-                    noiseData[i] = (Math.random() * 2 - 1) * (1 - i / noiseBuffer.length);
+                // Stick attack transient
+                const attack = audioContext.createBufferSource();
+                const attackBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.03, audioContext.sampleRate);
+                const attackData = attackBuffer.getChannelData(0);
+                for (let i = 0; i < attackBuffer.length; i++) {
+                    const env = 1 - (i / attackBuffer.length);
+                    attackData[i] = (Math.random() * 2 - 1) * env * env;
                 }
-                noise.buffer = noiseBuffer;
+                attack.buffer = attackBuffer;
                 
-                const noiseFilter = audioContext.createBiquadFilter();
-                noiseFilter.type = 'lowpass';
-                noiseFilter.frequency.value = 800;
+                const attackFilter = audioContext.createBiquadFilter();
+                attackFilter.type = 'lowpass';
+                attackFilter.frequency.value = 1200;
+                attackFilter.Q.value = 1;
                 
-                const noiseGain = audioContext.createGain();
-                noiseGain.gain.setValueAtTime(0.3, now);
-                noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                const attackGain = audioContext.createGain();
+                attackGain.gain.setValueAtTime(0.5, now);
+                attackGain.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
                 
-                noise.connect(noiseFilter);
-                noiseFilter.connect(noiseGain);
+                attack.connect(attackFilter);
+                attackFilter.connect(attackGain);
                 
-                // Main tone envelope
-                const gain = audioContext.createGain();
-                gain.gain.setValueAtTime(0.8, now);
-                gain.gain.exponentialRampToValueAtTime(0.4, now + 0.1);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                // Envelope shaping for natural tom sound
+                const mainGain = audioContext.createGain();
+                mainGain.gain.setValueAtTime(0, now);
+                mainGain.gain.linearRampToValueAtTime(0.85, now + 0.005); // Fast attack
+                mainGain.gain.setValueAtTime(0.75, now + 0.02);
+                mainGain.gain.exponentialRampToValueAtTime(0.5, now + 0.1);
+                mainGain.gain.exponentialRampToValueAtTime(0.2, now + 0.3);
+                mainGain.gain.exponentialRampToValueAtTime(0.05, now + 0.5);
+                mainGain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
                 
-                osc1.connect(gain);
-                osc2.connect(gain);
-                osc3.connect(gain);
+                // Mix oscillators with different levels
+                const fundamentalGain = audioContext.createGain();
+                fundamentalGain.gain.value = 1.0;
                 
-                gain.connect(audioContext.destination);
-                noiseGain.connect(audioContext.destination);
+                const overtone1Gain = audioContext.createGain();
+                overtone1Gain.gain.value = 0.4;
                 
-                osc1.start(now);
-                osc2.start(now);
-                osc3.start(now);
-                noise.start(now);
+                const overtone2Gain = audioContext.createGain();
+                overtone2Gain.gain.value = 0.2;
                 
-                osc1.stop(now + 0.6);
-                osc2.stop(now + 0.6);
-                osc3.stop(now + 0.6);
-                noise.stop(now + 0.05);
+                const shellGain = audioContext.createGain();
+                shellGain.gain.value = 0.3;
+                
+                fundamental.connect(fundamentalGain);
+                overtone1.connect(overtone1Gain);
+                overtone2.connect(overtone2Gain);
+                shellResonance.connect(shellGain);
+                
+                fundamentalGain.connect(mainGain);
+                overtone1Gain.connect(mainGain);
+                overtone2Gain.connect(mainGain);
+                shellGain.connect(mainGain);
+                
+                // Room ambience
+                const reverb = audioContext.createGain();
+                reverb.gain.value = 0.12;
+                
+                mainGain.connect(reverb);
+                mainGain.connect(audioContext.destination);
+                reverb.connect(audioContext.destination);
+                attackGain.connect(audioContext.destination);
+                
+                fundamental.start(now);
+                overtone1.start(now);
+                overtone2.start(now);
+                shellResonance.start(now);
+                attack.start(now);
+                
+                fundamental.stop(now + 0.7);
+                overtone1.stop(now + 0.5);
+                overtone2.stop(now + 0.35);
+                shellResonance.stop(now + 0.6);
+                attack.stop(now + 0.03);
             }
         }
 
