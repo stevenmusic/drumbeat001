@@ -2,91 +2,165 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>爵士鼓練習節奏 - Drum Practice</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Drum Practice - Rhythm Game</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Allow text selection in pattern cards */
+        .pattern-notation {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: relative;
         }
 
         body {
-            font-family: 'Comic Sans MS', 'Arial', 'Microsoft JhengHei', sans-serif;
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
             background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
             color: #6a1b9a;
             min-height: 100vh;
-            padding: 20px;
-            overflow-x: hidden;
         }
 
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            gap: 15px;
         }
 
         header {
             text-align: center;
-            padding: 30px 0;
+            padding: 15px 0;
             background: linear-gradient(135deg, #ce93d8 0%, #ba68c8 100%);
-            border-radius: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 20px rgba(186, 104, 200, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 6px 15px rgba(186, 104, 200, 0.3);
             border: 3px solid #fff;
+            flex-shrink: 0;
         }
 
         h1 {
-            font-size: 2.8em;
-            margin-bottom: 10px;
+            font-size: 2em;
+            margin-bottom: 5px;
             color: #fff;
-            text-shadow: 3px 3px 6px rgba(106, 27, 154, 0.3);
+            text-shadow: 2px 2px 4px rgba(106, 27, 154, 0.3);
             font-weight: bold;
         }
 
         .subtitle {
             color: #fff;
-            font-size: 1.2em;
+            font-size: 1em;
             font-weight: 400;
         }
 
         .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: 80vh;
+            min-height: 600px;
         }
 
-        /* 鼓組區域 */
-        .drum-kit-section {
+        /* 節拍器區域 - 放在上方 */
+        .metronome-section {
             background: linear-gradient(135deg, #fff 0%, #f8e5ff 100%);
-            border-radius: 25px;
-            padding: 30px;
+            border-radius: 20px;
+            padding: 15px 20px;
             border: 3px solid #ce93d8;
-            box-shadow: 0 8px 20px rgba(206, 147, 216, 0.3);
+            box-shadow: 0 6px 15px rgba(206, 147, 216, 0.3);
+            flex-shrink: 0;
         }
 
-        .section-title {
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            color: #8e24aa;
+        .metronome-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .bpm-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .bpm-display {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #ab47bc;
+            text-shadow: 2px 2px 4px rgba(171, 71, 188, 0.3);
+            min-width: 80px;
             text-align: center;
+        }
+
+        .bpm-label {
+            font-size: 1em;
+            color: #8e24aa;
             font-weight: bold;
         }
 
-        .drum-container {
-            position: relative;
-            width: 100%;
-            height: 500px;
+        /* 鼓組區域 - 佔據大部分空間 */
+        .drum-kit-section {
+            background: linear-gradient(135deg, #fff 0%, #f8e5ff 100%);
+            border-radius: 20px;
+            padding: 20px;
+            border: 3px solid #ce93d8;
+            box-shadow: 0 6px 15px rgba(206, 147, 216, 0.3);
+            flex: 1;
+            min-height: 0;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #8e24aa;
+            text-align: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .drum-container {
+            width: 100%;
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 12px;
+            min-height: 0;
+        }
+
+        .drum-zone {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
 
         .drum {
-            position: absolute;
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
@@ -94,13 +168,22 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 1.1em;
+            font-size: 1.5em;
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15), inset 0 2px 5px rgba(255, 255, 255, 0.5);
+            position: relative;
+        }
+
+        .drum::before {
+            content: attr(data-hand);
+            position: absolute;
+            top: 8px;
+            font-size: 0.6em;
+            opacity: 0.6;
         }
 
         .drum:hover {
-            transform: scale(1.1) rotate(5deg);
+            transform: scale(1.05);
             box-shadow: 0 10px 25px rgba(206, 147, 216, 0.5);
         }
 
@@ -113,87 +196,56 @@
         }
 
         @keyframes drumHit {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            25% { transform: scale(1.2) rotate(-10deg); }
-            75% { transform: scale(1.2) rotate(10deg); }
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); box-shadow: 0 0 30px rgba(206, 147, 216, 0.8); }
         }
 
-        /* 鼓的位置 */
-        .snare {
-            bottom: 50px;
-            left: 50px;
-            background: linear-gradient(145deg, #e1bee7, #ce93d8);
-            border: 5px solid #ba68c8;
-            color: #6a1b9a;
+        /* 鼓的位置 - 左上角 Tom1 */
+        .tom1-zone {
+            grid-column: 1;
+            grid-row: 1;
         }
 
-        .tom1 {
-            top: 50px;
-            left: 50px;
+        .tom1-left, .tom1-right {
             background: linear-gradient(145deg, #b39ddb, #9575cd);
             border: 5px solid #7e57c2;
             color: #4a148c;
         }
 
-        .tom2 {
-            top: 50px;
-            right: 50px;
+        /* 右上角 Tom2 */
+        .tom2-zone {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        .tom2-left, .tom2-right {
             background: linear-gradient(145deg, #ffccbc, #ffab91);
             border: 5px solid #ff8a65;
             color: #d84315;
         }
 
-        .tom3 {
-            bottom: 50px;
-            right: 50px;
+        /* 左下角 Snare */
+        .snare-zone {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .snare-left, .snare-right {
+            background: linear-gradient(145deg, #e1bee7, #ce93d8);
+            border: 5px solid #ba68c8;
+            color: #6a1b9a;
+        }
+
+        /* 右下角 Tom3 */
+        .tom3-zone {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .tom3-left, .tom3-right {
             background: linear-gradient(145deg, #b3e5fc, #81d4fa);
             border: 5px solid #4fc3f7;
             color: #01579b;
-        }
-
-        .hi-hat {
-            top: 120px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(145deg, #fff9c4, #fff59d);
-            border: 5px solid #ffd54f;
-            color: #f57f17;
-        }
-
-        .bass-drum {
-            bottom: 120px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 160px;
-            height: 160px;
-            background: linear-gradient(145deg, #f5f5f5, #e0e0e0);
-            border: 6px solid #9e9e9e;
-            font-size: 1.2em;
-            color: #424242;
-        }
-
-        .crash {
-            top: 30px;
-            left: 50%;
-            transform: translateX(-180%);
-            width: 90px;
-            height: 90px;
-            background: linear-gradient(145deg, #c8e6c9, #a5d6a7);
-            border: 5px solid #81c784;
-            color: #2e7d32;
-        }
-
-        .ride {
-            top: 30px;
-            right: 50%;
-            transform: translateX(180%);
-            width: 95px;
-            height: 95px;
-            background: linear-gradient(145deg, #c5cae9, #9fa8da);
-            border: 5px solid #7986cb;
-            color: #283593;
         }
 
         /* 節拍器區域 */
@@ -228,14 +280,12 @@
         .bpm-controls {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 20px;
-            margin: 30px 0;
+            gap: 10px;
         }
 
         .bpm-btn {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             background: linear-gradient(145deg, #ce93d8, #ba68c8);
             border: 3px solid #fff;
@@ -244,16 +294,21 @@
             cursor: pointer;
             transition: all 0.2s ease;
             box-shadow: 0 4px 10px rgba(206, 147, 216, 0.3);
+            flex-shrink: 0;
         }
 
         .bpm-btn:hover {
-            transform: scale(1.15) rotate(10deg);
+            transform: scale(1.15);
             box-shadow: 0 6px 15px rgba(206, 147, 216, 0.5);
         }
 
+        .bpm-btn:active {
+            transform: scale(0.95);
+        }
+
         .bpm-slider {
-            width: 100%;
-            margin: 20px 0;
+            flex: 1;
+            min-width: 150px;
         }
 
         input[type="range"] {
@@ -276,17 +331,22 @@
             box-shadow: 0 2px 8px rgba(186, 104, 200, 0.5);
         }
 
+        .control-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
         .metronome-btn {
-            width: 100%;
-            padding: 20px;
-            font-size: 1.5em;
+            padding: 12px 25px;
+            font-size: 1.2em;
             font-weight: bold;
             border: 3px solid #fff;
-            border-radius: 20px;
+            border-radius: 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 10px 0;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            flex-shrink: 0;
         }
 
         .start-btn {
@@ -295,8 +355,8 @@
         }
 
         .start-btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 20px rgba(129, 199, 132, 0.5);
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(129, 199, 132, 0.5);
         }
 
         .stop-btn {
@@ -305,20 +365,20 @@
         }
 
         .stop-btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 20px rgba(239, 83, 80, 0.5);
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(239, 83, 80, 0.5);
         }
 
         .beat-indicator {
             display: flex;
+            gap: 10px;
+            flex: 1;
             justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
         }
 
         .beat-dot {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             background: #e1bee7;
             border: 3px solid #ce93d8;
@@ -328,18 +388,26 @@
         .beat-dot.active {
             background: linear-gradient(145deg, #ba68c8, #ab47bc);
             border-color: #8e24aa;
-            box-shadow: 0 0 20px rgba(186, 104, 200, 0.8);
-            transform: scale(1.4);
+            box-shadow: 0 0 15px rgba(186, 104, 200, 0.8);
+            transform: scale(1.3);
         }
 
-        /* 鼓點選擇區域 */
+        /* Patterns Section - At Bottom */
         .patterns-section {
             background: linear-gradient(135deg, #fff 0%, #f8e5ff 100%);
             border-radius: 25px;
             padding: 30px;
             border: 3px solid #ce93d8;
             box-shadow: 0 8px 20px rgba(206, 147, 216, 0.3);
-            grid-column: 1 / -1;
+            margin-bottom: 20px;
+        }
+
+        .patterns-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #8e24aa;
+            text-align: center;
+            font-weight: bold;
         }
 
         .patterns-grid {
@@ -401,7 +469,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 10px;
-            margin-top: 20px;
+            margin-bottom: 20px;
             padding: 20px;
             background: linear-gradient(135deg, #f3e5f5, #e1bee7);
             border-radius: 15px;
@@ -427,28 +495,60 @@
             border-radius: 5px;
         }
 
-        @media (max-width: 968px) {
-            .main-content {
-                grid-template-columns: 1fr;
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+                gap: 10px;
             }
 
             h1 {
-                font-size: 2em;
+                font-size: 1.5em;
             }
 
-            .drum-container {
-                height: 400px;
-            }
-
-            .drum {
-                width: 100px;
-                height: 100px;
+            .subtitle {
                 font-size: 0.9em;
             }
 
-            .bass-drum {
-                width: 130px;
-                height: 130px;
+            .main-content {
+                height: 70vh;
+                min-height: 500px;
+            }
+
+            .metronome-display {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .bpm-display {
+                font-size: 2em;
+            }
+
+            .drum {
+                font-size: 1.2em;
+            }
+
+            .metronome-btn {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+
+            .patterns-section {
+                padding: 20px;
+            }
+
+            .patterns-title {
+                font-size: 1.3em;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .drum {
+                font-size: 1.4em;
+            }
+
+            .main-content {
+                height: 75vh;
+                min-height: 550px;
             }
         }
     </style>
@@ -456,107 +556,106 @@
 <body>
     <div class="container">
         <header>
-            <h1>🥁 爵士鼓練習節奏</h1>
-            <p class="subtitle">Drum Practice Studio - 10種經典鼓點</p>
+            <h1>🥁 Drum Practice</h1>
+            <p class="subtitle">iPad Touch Version - Rhythm Game</p>
         </header>
 
         <div class="main-content">
-            <!-- 鼓組區域 -->
-            <div class="drum-kit-section">
-                <h2 class="section-title">互動鼓組</h2>
-                <div class="drum-container">
-                    <div class="drum snare" data-sound="snare" data-key="d">
-                        <div>Snare</div>
-                        <div style="font-size: 0.8em; margin-top: 5px;">D</div>
+            <!-- Metronome Section - On Top -->
+            <div class="metronome-section">
+                <div class="metronome-display">
+                    <div class="bpm-section">
+                        <div class="bpm-label">BPM</div>
+                        <div class="bpm-display" id="bpmDisplay">90</div>
                     </div>
-                    <div class="drum tom1" data-sound="tom1" data-key="f">
-                        <div>Tom 1</div>
-                        <div style="font-size: 0.8em; margin-top: 5px;">F</div>
+                    
+                    <div class="bpm-controls">
+                        <button class="bpm-btn" id="bpmDown">−</button>
+                        <div class="bpm-slider">
+                            <input type="range" id="bpmSlider" min="40" max="240" value="90">
+                        </div>
+                        <button class="bpm-btn" id="bpmUp">+</button>
                     </div>
-                    <div class="drum tom2" data-sound="tom2" data-key="g">
-                        <div>Tom 2</div>
-                        <div style="font-size: 0.8em; margin-top: 5px;">G</div>
-                    </div>
-                    <div class="drum tom3" data-sound="tom3" data-key="h">
-                        <div>Tom 3</div>
-                        <div style="font-size: 0.8em; margin-top: 5px;">H</div>
-                    </div>
-                    <div class="drum hi-hat" data-sound="hihat" data-key="j">
-                        <div>Hi-Hat</div>
-                        <div style="font-size: 0.8em; margin-top: 5px;">J</div>
-                    </div>
-                    <div class="drum bass-drum" data-sound="bass" data-key="space">
-                        <div>Bass</div>
-                        <div style="font-size: 0.8em; margin-top: 5px;">Space</div>
-                    </div>
-                    <div class="drum crash" data-sound="crash" data-key="k">
-                        <div>Crash</div>
-                        <div style="font-size: 0.8em; margin-top: 5px;">K</div>
-                    </div>
-                    <div class="drum ride" data-sound="ride" data-key="l">
-                        <div>Ride</div>
-                        <div style="font-size: 0.8em; margin-top: 5px;">L</div>
+
+                    <div class="control-section">
+                        <button class="metronome-btn start-btn" id="startBtn">▶ Start</button>
+                        <button class="metronome-btn stop-btn" id="stopBtn" style="display: none;">⏸ Stop</button>
+                        <div class="beat-indicator"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- 節拍器區域 -->
-            <div class="metronome-section">
-                <h2 class="section-title">節拍器</h2>
-                <div class="metronome-display">
-                    <div class="bpm-label">速度 (BPM)</div>
-                    <div class="bpm-display" id="bpmDisplay">120</div>
-                    
-                    <div class="bpm-controls">
-                        <button class="bpm-btn" id="bpmDown">−</button>
-                        <button class="bpm-btn" id="bpmUp">+</button>
-                    </div>
-                    
-                    <div class="bpm-slider">
-                        <input type="range" id="bpmSlider" min="40" max="240" value="120">
-                    </div>
-
-                    <div class="beat-indicator">
-                        <div class="beat-dot"></div>
-                        <div class="beat-dot"></div>
-                        <div class="beat-dot"></div>
-                        <div class="beat-dot"></div>
+            <!-- Drum Kit Section - Takes Most Space -->
+            <div class="drum-kit-section">
+                <h2 class="section-title">Interactive Drum Kit</h2>
+                <div class="drum-container">
+                    <!-- Top Left - Tom1 -->
+                    <div class="drum-zone tom1-zone">
+                        <div class="drum tom1-left" data-sound="tom1" data-hand="👈 L">
+                            <div>Tom 1</div>
+                            <div style="font-size: 0.6em; margin-top: 5px;">Left</div>
+                        </div>
+                        <div class="drum tom1-right" data-sound="tom1" data-hand="👉 R">
+                            <div>Tom 1</div>
+                            <div style="font-size: 0.6em; margin-top: 5px;">Right</div>
+                        </div>
                     </div>
 
-                    <button class="metronome-btn start-btn" id="startBtn">▶ 開始</button>
-                    <button class="metronome-btn stop-btn" id="stopBtn" style="display: none;">⏸ 停止</button>
+                    <!-- Top Right - Tom2 -->
+                    <div class="drum-zone tom2-zone">
+                        <div class="drum tom2-left" data-sound="tom2" data-hand="👈 L">
+                            <div>Tom 2</div>
+                            <div style="font-size: 0.6em; margin-top: 5px;">Left</div>
+                        </div>
+                        <div class="drum tom2-right" data-sound="tom2" data-hand="👉 R">
+                            <div>Tom 2</div>
+                            <div style="font-size: 0.6em; margin-top: 5px;">Right</div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Left - Snare -->
+                    <div class="drum-zone snare-zone">
+                        <div class="drum snare-left" data-sound="snare" data-hand="👈 L">
+                            <div>Snare</div>
+                            <div style="font-size: 0.6em; margin-top: 5px;">Left</div>
+                        </div>
+                        <div class="drum snare-right" data-sound="snare" data-hand="👉 R">
+                            <div>Snare</div>
+                            <div style="font-size: 0.6em; margin-top: 5px;">Right</div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Right - Tom3 -->
+                    <div class="drum-zone tom3-zone">
+                        <div class="drum tom3-left" data-sound="tom3" data-hand="👈 L">
+                            <div>Tom 3</div>
+                            <div style="font-size: 0.6em; margin-top: 5px;">Left</div>
+                        </div>
+                        <div class="drum tom3-right" data-sound="tom3" data-hand="👉 R">
+                            <div>Tom 3</div>
+                            <div style="font-size: 0.6em; margin-top: 5px;">Right</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 鼓點選擇區域 -->
+        <!-- Patterns Section - At Bottom -->
         <div class="patterns-section">
-            <h2 class="section-title">10種經典鼓點</h2>
+            <h2 class="patterns-title">8 Simple Drum Patterns</h2>
             
             <div class="legend">
                 <div class="legend-item">
-                    <span class="legend-symbol">HH</span> Hi-Hat
+                    <span class="legend-symbol">SD</span> Snare (Snare Drum)
                 </div>
                 <div class="legend-item">
-                    <span class="legend-symbol">SD</span> Snare
+                    <span class="legend-symbol">T1</span> Tom 1 (High Tom)
                 </div>
                 <div class="legend-item">
-                    <span class="legend-symbol">BD</span> Bass
+                    <span class="legend-symbol">T2</span> Tom 2 (Mid Tom)
                 </div>
                 <div class="legend-item">
-                    <span class="legend-symbol">T1</span> Tom 1
-                </div>
-                <div class="legend-item">
-                    <span class="legend-symbol">T2</span> Tom 2
-                </div>
-                <div class="legend-item">
-                    <span class="legend-symbol">T3</span> Tom 3
-                </div>
-                <div class="legend-item">
-                    <span class="legend-symbol">CR</span> Crash
-                </div>
-                <div class="legend-item">
-                    <span class="legend-symbol">RD</span> Ride
+                    <span class="legend-symbol">T3</span> Tom 3 (Low Tom)
                 </div>
             </div>
 
@@ -565,189 +664,123 @@
     </div>
 
     <script>
-        // 10種經典鼓點數據
+        // 8 Simplified Drum Patterns - Using only Snare, Tom1, Tom2, Tom3
         const drumPatterns = [
             {
-                name: "1. 基本搖滾節奏",
-                description: "最基礎的搖滾鼓點，適合初學者練習",
-                notation: `Count: 1   &   2   &   3   &   4   &
-HH:    x   x   x   x   x   x   x   x
-SD:        -   -   x   -   -   x   -
-BD:    x   -   -   -   x   -   -   -`,
+                name: "1. Basic Single Hits",
+                description: "Simplest single hit rhythm for beginners",
+                beats: 4,
+                notation: `Beat: 1   2   3   4
+SD:   x   x   x   x`,
                 pattern: [
-                    {beat: 1, drums: ['hihat', 'bass']},
-                    {beat: 1.5, drums: ['hihat']},
-                    {beat: 2, drums: ['hihat', 'snare']},
-                    {beat: 2.5, drums: ['hihat']},
-                    {beat: 3, drums: ['hihat', 'bass']},
-                    {beat: 3.5, drums: ['hihat']},
-                    {beat: 4, drums: ['hihat', 'snare']},
-                    {beat: 4.5, drums: ['hihat']}
+                    {beat: 1, drums: ['snare']},
+                    {beat: 2, drums: ['snare']},
+                    {beat: 3, drums: ['snare']},
+                    {beat: 4, drums: ['snare']}
                 ]
             },
             {
-                name: "2. 標準爵士搖擺",
-                description: "經典爵士搖擺節奏，使用Ride鈸",
-                notation: `Count: 1   &   2   &   3   &   4   &
-RD:    x   x   x   x   x   x   x   x
-SD:        -   -   x   -   -   x   -
-BD:    x   -   -   -   -   -   -   -`,
-                pattern: [
-                    {beat: 1, drums: ['ride', 'bass']},
-                    {beat: 1.5, drums: ['ride']},
-                    {beat: 2, drums: ['ride', 'snare']},
-                    {beat: 2.5, drums: ['ride']},
-                    {beat: 3, drums: ['ride']},
-                    {beat: 3.5, drums: ['ride']},
-                    {beat: 4, drums: ['ride', 'snare']},
-                    {beat: 4.5, drums: ['ride']}
-                ]
-            },
-            {
-                name: "3. 雙踩 (Double Bass)",
-                description: "金屬搖滾常用，雙大鼓節奏",
-                notation: `Count: 1   &   2   &   3   &   4   &
-HH:    x   x   x   x   x   x   x   x
-SD:        -   -   x   -   -   x   -
-BD:    x   x   x   x   x   x   x   x`,
-                pattern: [
-                    {beat: 1, drums: ['hihat', 'bass']},
-                    {beat: 1.5, drums: ['hihat', 'bass']},
-                    {beat: 2, drums: ['hihat', 'snare', 'bass']},
-                    {beat: 2.5, drums: ['hihat', 'bass']},
-                    {beat: 3, drums: ['hihat', 'bass']},
-                    {beat: 3.5, drums: ['hihat', 'bass']},
-                    {beat: 4, drums: ['hihat', 'snare', 'bass']},
-                    {beat: 4.5, drums: ['hihat', 'bass']}
-                ]
-            },
-            {
-                name: "4. Motown節奏",
-                description: "經典靈魂樂、放克音樂節奏",
-                notation: `Count: 1   &   2   &   3   &   4   &
-HH:    x   -   x   -   x   -   x   -
-SD:        -   -   x   -   -   x   -
-BD:    x   -   x   -   -   -   x   -`,
-                pattern: [
-                    {beat: 1, drums: ['hihat', 'bass']},
-                    {beat: 1.5, drums: ['bass']},
-                    {beat: 2, drums: ['hihat', 'snare']},
-                    {beat: 3, drums: ['hihat']},
-                    {beat: 4, drums: ['hihat', 'snare', 'bass']}
-                ]
-            },
-            {
-                name: "5. 三連音 Fill",
-                description: "經典的Tom三連音過門",
-                notation: `Count: 1   &   a   2   &   a   3   &   a   4   &   a
-T1:    x   x   x   -   -   -   -   -   -   -   -   -
-T2:    -   -   -   x   x   x   -   -   -   -   -   -
-T3:    -   -   -   -   -   -   x   x   x   -   -   -
-SD:    -   -   -   -   -   -   -   -   -   x   x   x`,
+                name: "2. Up Down Alternate",
+                description: "Tom1 and Snare alternating practice",
+                beats: 4,
+                notation: `Beat: 1   2   3   4
+T1:   x   -   x   -
+SD:   -   x   -   x`,
                 pattern: [
                     {beat: 1, drums: ['tom1']},
-                    {beat: 1.33, drums: ['tom1']},
-                    {beat: 1.66, drums: ['tom1']},
-                    {beat: 2, drums: ['tom2']},
-                    {beat: 2.33, drums: ['tom2']},
-                    {beat: 2.66, drums: ['tom2']},
-                    {beat: 3, drums: ['tom3']},
-                    {beat: 3.33, drums: ['tom3']},
-                    {beat: 3.66, drums: ['tom3']},
-                    {beat: 4, drums: ['snare']},
-                    {beat: 4.33, drums: ['snare']},
-                    {beat: 4.66, drums: ['snare']}
-                ]
-            },
-            {
-                name: "6. 雷鬼 (Reggae)",
-                description: "雷鬼音樂特有的後拍強調",
-                notation: `Count: 1   &   2   &   3   &   4   &
-HH:    -   x   -   x   -   x   -   x
-SD:        -   -   x   -   -   x   -
-BD:    x   -   -   -   x   -   -   -`,
-                pattern: [
-                    {beat: 1, drums: ['bass']},
-                    {beat: 1.5, drums: ['hihat']},
                     {beat: 2, drums: ['snare']},
-                    {beat: 2.5, drums: ['hihat']},
-                    {beat: 3, drums: ['bass']},
-                    {beat: 3.5, drums: ['hihat']},
-                    {beat: 4, drums: ['snare']},
-                    {beat: 4.5, drums: ['hihat']}
+                    {beat: 3, drums: ['tom1']},
+                    {beat: 4, drums: ['snare']}
                 ]
             },
             {
-                name: "7. 放克節奏 (Funk)",
-                description: "律動感強的放克鼓點",
-                notation: `Count: 1   &   2   &   3   &   4   &
-HH:    x   x   x   x   x   x   x   x
-SD:        -   x   -   x   -   x   -
-BD:    x   -   -   x   -   -   x   -`,
+                name: "3. Three Tom Roll",
+                description: "Tom1, Tom2, Tom3 in sequence",
+                beats: 3,
+                notation: `Beat: 1   2   3
+T1:   x   -   -
+T2:   -   x   -
+T3:   -   -   x`,
                 pattern: [
-                    {beat: 1, drums: ['hihat', 'bass']},
-                    {beat: 1.5, drums: ['hihat', 'snare']},
-                    {beat: 2, drums: ['hihat', 'bass']},
-                    {beat: 2.5, drums: ['hihat', 'snare']},
-                    {beat: 3, drums: ['hihat']},
-                    {beat: 3.5, drums: ['hihat', 'snare']},
-                    {beat: 4, drums: ['hihat', 'bass']},
-                    {beat: 4.5, drums: ['hihat']}
-                ]
-            },
-            {
-                name: "8. Bossa Nova",
-                description: "巴西森巴風格節奏",
-                notation: `Count: 1   &   2   &   3   &   4   &
-RD:    x   -   x   -   x   -   x   -
-SD:        -   x   -   -   x   -   -
-BD:    x   -   -   -   x   -   x   -`,
-                pattern: [
-                    {beat: 1, drums: ['ride', 'bass']},
-                    {beat: 1.5, drums: ['snare']},
-                    {beat: 2, drums: ['ride']},
-                    {beat: 3, drums: ['ride', 'bass']},
-                    {beat: 3.5, drums: ['snare']},
-                    {beat: 4, drums: ['ride', 'bass']}
-                ]
-            },
-            {
-                name: "9. 半拍搖滾",
-                description: "節奏變化豐富的搖滾節奏",
-                notation: `Count: 1   &   2   &   3   &   4   &
-HH:    x   x   x   x   x   x   x   x
-SD:        -   x   -   -   -   x   -
-BD:    x   -   -   -   x   x   -   -`,
-                pattern: [
-                    {beat: 1, drums: ['hihat', 'bass']},
-                    {beat: 1.5, drums: ['hihat', 'snare']},
-                    {beat: 2, drums: ['hihat']},
-                    {beat: 2.5, drums: ['hihat']},
-                    {beat: 3, drums: ['hihat', 'bass']},
-                    {beat: 3.5, drums: ['hihat', 'bass']},
-                    {beat: 4, drums: ['hihat', 'snare']},
-                    {beat: 4.5, drums: ['hihat']}
-                ]
-            },
-            {
-                name: "10. Crash結尾",
-                description: "歌曲結尾常用的Crash強調",
-                notation: `Count: 1   &   2   &   3   &   4   &
-CR:    x   -   -   -   -   -   -   -
-T1:    x   x   -   -   -   -   -   -
-T2:    -   -   x   x   -   -   -   -
-T3:    -   -   -   -   x   x   -   -
-SD:    -   -   -   -   -   -   x   -
-BD:    x   -   -   -   -   -   x   x`,
-                pattern: [
-                    {beat: 1, drums: ['crash', 'tom1', 'bass']},
-                    {beat: 1.5, drums: ['tom1']},
+                    {beat: 1, drums: ['tom1']},
                     {beat: 2, drums: ['tom2']},
-                    {beat: 2.5, drums: ['tom2']},
+                    {beat: 3, drums: ['tom3']}
+                ]
+            },
+            {
+                name: "4. Double Hit Practice",
+                description: "Two hits per drum, practice coordination",
+                beats: 4,
+                notation: `Beat: 1   2   3   4
+T1:   x   x   -   -
+SD:   -   -   x   x`,
+                pattern: [
+                    {beat: 1, drums: ['tom1']},
+                    {beat: 2, drums: ['tom1']},
+                    {beat: 3, drums: ['snare']},
+                    {beat: 4, drums: ['snare']}
+                ]
+            },
+            {
+                name: "5. Descending Roll",
+                description: "Roll from high tom down to snare",
+                beats: 4,
+                notation: `Beat: 1   2   3   4
+T1:   x   -   -   -
+T2:   -   x   -   -
+T3:   -   -   x   -
+SD:   -   -   -   x`,
+                pattern: [
+                    {beat: 1, drums: ['tom1']},
+                    {beat: 2, drums: ['tom2']},
                     {beat: 3, drums: ['tom3']},
-                    {beat: 3.5, drums: ['tom3']},
-                    {beat: 4, drums: ['snare', 'bass']},
-                    {beat: 4.5, drums: ['bass']}
+                    {beat: 4, drums: ['snare']}
+                ]
+            },
+            {
+                name: "6. Echo Practice",
+                description: "Tom1 hits with others following",
+                beats: 4,
+                notation: `Beat: 1   2   3   4
+T1:   x   x   x   x
+T2:   -   x   -   -
+T3:   -   -   x   -
+SD:   -   -   -   x`,
+                pattern: [
+                    {beat: 1, drums: ['tom1']},
+                    {beat: 2, drums: ['tom1', 'tom2']},
+                    {beat: 3, drums: ['tom1', 'tom3']},
+                    {beat: 4, drums: ['tom1', 'snare']}
+                ]
+            },
+            {
+                name: "7. Climbing Stairs",
+                description: "Climb from snare up to tom1",
+                beats: 4,
+                notation: `Beat: 1   2   3   4
+SD:   x   -   -   -
+T3:   -   x   -   -
+T2:   -   -   x   -
+T1:   -   -   -   x`,
+                pattern: [
+                    {beat: 1, drums: ['snare']},
+                    {beat: 2, drums: ['tom3']},
+                    {beat: 3, drums: ['tom2']},
+                    {beat: 4, drums: ['tom1']}
+                ]
+            },
+            {
+                name: "8. Strong Weak Contrast",
+                description: "Snare strong beat, Tom weak beat",
+                beats: 4,
+                notation: `Beat: 1   2   3   4
+SD:   x   -   x   -
+T2:   -   x   -   x`,
+                pattern: [
+                    {beat: 1, drums: ['snare']},
+                    {beat: 2, drums: ['tom2']},
+                    {beat: 3, drums: ['snare']},
+                    {beat: 4, drums: ['tom2']}
                 ]
             }
         ];
@@ -921,7 +954,7 @@ BD:    x   -   -   -   -   -   x   x`,
             }
         }
 
-        // 鼓組點擊事件
+        // 鼓組點擊事件（觸控優先）
         document.querySelectorAll('.drum').forEach(drum => {
             drum.addEventListener('click', function() {
                 const sound = this.dataset.sound;
@@ -929,35 +962,19 @@ BD:    x   -   -   -   -   -   x   x`,
                 this.classList.add('hit');
                 setTimeout(() => this.classList.remove('hit'), 300);
             });
-        });
-
-        // 鍵盤事件
-        document.addEventListener('keydown', function(e) {
-            const keyMap = {
-                'd': 'snare',
-                'f': 'tom1',
-                'g': 'tom2',
-                'h': 'tom3',
-                'j': 'hihat',
-                ' ': 'bass',
-                'k': 'crash',
-                'l': 'ride'
-            };
-
-            const sound = keyMap[e.key.toLowerCase()];
-            if (sound) {
+            
+            // 支援觸控設備
+            drum.addEventListener('touchstart', function(e) {
                 e.preventDefault();
+                const sound = this.dataset.sound;
                 playDrum(sound);
-                const drumElement = document.querySelector(`[data-sound="${sound}"]`);
-                if (drumElement) {
-                    drumElement.classList.add('hit');
-                    setTimeout(() => drumElement.classList.remove('hit'), 300);
-                }
-            }
+                this.classList.add('hit');
+                setTimeout(() => this.classList.remove('hit'), 300);
+            });
         });
 
         // 節拍器變數
-        let bpm = 120;
+        let bpm = 90;
         let isPlaying = false;
         let intervalId = null;
         let currentBeat = 0;
@@ -968,7 +985,17 @@ BD:    x   -   -   -   -   -   x   x`,
         const bpmSlider = document.getElementById('bpmSlider');
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
-        const beatDots = document.querySelectorAll('.beat-dot');
+        const beatIndicator = document.querySelector('.beat-indicator');
+
+        // 創建動態節拍指示器
+        function createBeatIndicator(beats) {
+            beatIndicator.innerHTML = '';
+            for (let i = 0; i < beats; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'beat-dot';
+                beatIndicator.appendChild(dot);
+            }
+        }
 
         // BPM控制
         document.getElementById('bpmUp').addEventListener('click', () => {
@@ -997,11 +1024,14 @@ BD:    x   -   -   -   -   -   x   x`,
 
         // 節拍器功能
         function startMetronome() {
+            if (!currentPattern) return;
+            
             isPlaying = true;
             startBtn.style.display = 'none';
             stopBtn.style.display = 'block';
             currentBeat = 0;
 
+            const beats = currentPattern.beats;
             const interval = 60000 / bpm;
 
             intervalId = setInterval(() => {
@@ -1020,17 +1050,16 @@ BD:    x   -   -   -   -   -   x   x`,
                 oscillator.stop(audioContext.currentTime + 0.1);
 
                 // 更新視覺指示
+                const beatDots = document.querySelectorAll('.beat-dot');
                 beatDots.forEach((dot, index) => {
                     dot.classList.toggle('active', index === currentBeat);
                 });
 
-                currentBeat = (currentBeat + 1) % 4;
+                currentBeat = (currentBeat + 1) % beats;
             }, interval);
 
             // 播放選中的鼓點
-            if (currentPattern) {
-                playPattern(currentPattern);
-            }
+            playPattern(currentPattern);
         }
 
         function stopMetronome() {
@@ -1048,6 +1077,7 @@ BD:    x   -   -   -   -   -   x   x`,
                 patternIntervalId = null;
             }
 
+            const beatDots = document.querySelectorAll('.beat-dot');
             beatDots.forEach(dot => dot.classList.remove('active'));
             currentBeat = 0;
         }
@@ -1061,21 +1091,20 @@ BD:    x   -   -   -   -   -   x   x`,
                 clearInterval(patternIntervalId);
             }
 
-            const barDuration = (60000 / bpm) * 4; // 一小節的時長
-            let beatIndex = 0;
-
+            const barDuration = (60000 / bpm) * pattern.beats; // 一小節的時長
+            
             patternIntervalId = setInterval(() => {
-                const beatTime = (60000 / bpm) / 2; // 每半拍的時長
+                const beatTime = 60000 / bpm; // 每一拍的時長
                 
-                pattern.pattern.forEach((note, index) => {
+                pattern.pattern.forEach((note) => {
                     setTimeout(() => {
                         note.drums.forEach(drum => {
                             playDrum(drum);
-                            const drumElement = document.querySelector(`[data-sound="${drum}"]`);
-                            if (drumElement) {
+                            const drumElements = document.querySelectorAll(`[data-sound="${drum}"]`);
+                            drumElements.forEach(drumElement => {
                                 drumElement.classList.add('hit');
-                                setTimeout(() => drumElement.classList.remove('hit'), 100);
-                            }
+                                setTimeout(() => drumElement.classList.remove('hit'), 200);
+                            });
                         });
                     }, (note.beat - 1) * beatTime);
                 });
@@ -1099,8 +1128,13 @@ BD:    x   -   -   -   -   -   x   x`,
                 this.classList.add('active');
                 currentPattern = pattern;
                 
+                // 創建對應拍數的節拍指示器
+                createBeatIndicator(pattern.beats);
+                
+                // 如果正在播放，重新開始
                 if (isPlaying) {
-                    playPattern(pattern);
+                    stopMetronome();
+                    startMetronome();
                 }
             });
             
@@ -1110,6 +1144,7 @@ BD:    x   -   -   -   -   -   x   x`,
         // 默認選擇第一個鼓點
         document.querySelector('.pattern-card').classList.add('active');
         currentPattern = drumPatterns[0];
+        createBeatIndicator(currentPattern.beats);
     </script>
 </body>
 </html>
