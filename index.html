@@ -796,413 +796,247 @@ T2:   -   x   -   x`,
         // Audio Context
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-        // Create authentic acoustic jazz drum sounds
+        // Create authentic acoustic jazz drum sounds - optimized for rapid hits
         function playDrum(drumType) {
             const now = audioContext.currentTime;
             
             if (drumType === 'snare') {
-                // ACOUSTIC SNARE - Traditional jazz snare with natural resonance
+                // ACOUSTIC SNARE - Each hit creates completely independent nodes
                 
-                // 1. Drum shell fundamental (wood body resonance)
-                const fundamental = audioContext.createOscillator();
-                fundamental.type = 'sine';
-                fundamental.frequency.setValueAtTime(200, now);
-                fundamental.frequency.exponentialRampToValueAtTime(180, now + 0.05);
-                fundamental.frequency.exponentialRampToValueAtTime(160, now + 0.15);
-                
-                // 2. Second harmonic (shell mode)
-                const harmonic2 = audioContext.createOscillator();
-                harmonic2.type = 'sine';
-                harmonic2.frequency.setValueAtTime(330, now);
-                harmonic2.frequency.exponentialRampToValueAtTime(300, now + 0.1);
-                
-                // 3. Third harmonic (higher overtone)
-                const harmonic3 = audioContext.createOscillator();
-                harmonic3.type = 'sine';
-                harmonic3.frequency.setValueAtTime(480, now);
-                harmonic3.frequency.exponentialRampToValueAtTime(440, now + 0.08);
-                
-                const toneGain = audioContext.createGain();
-                toneGain.gain.setValueAtTime(0.5, now);
-                toneGain.gain.setValueAtTime(0.4, now + 0.01);
-                toneGain.gain.exponentialRampToValueAtTime(0.1, now + 0.08);
-                toneGain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-                
-                fundamental.connect(toneGain);
-                harmonic2.connect(toneGain);
-                harmonic3.connect(toneGain);
-                
-                // 4. Snare wires (metal rattling sound)
-                const wireNoise = audioContext.createBufferSource();
-                const wireBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.25, audioContext.sampleRate);
-                const wireData = wireBuffer.getChannelData(0);
-                
-                // Generate metallic noise with specific characteristics
-                for (let i = 0; i < wireBuffer.length; i++) {
-                    const decay = Math.exp(-i / audioContext.sampleRate * 10);
-                    wireData[i] = (Math.random() * 2 - 1) * decay;
-                }
-                wireNoise.buffer = wireBuffer;
-                
-                // High-pass for wire brightness
-                const wireHP = audioContext.createBiquadFilter();
-                wireHP.type = 'highpass';
-                wireHP.frequency.value = 1500;
-                wireHP.Q.value = 0.5;
-                
-                // Band-pass for wire character
-                const wireBP = audioContext.createBiquadFilter();
-                wireBP.type = 'bandpass';
-                wireBP.frequency.value = 4000;
-                wireBP.Q.value = 1.5;
-                
-                const wireGain = audioContext.createGain();
-                wireGain.gain.setValueAtTime(0.7, now);
-                wireGain.gain.exponentialRampToValueAtTime(0.2, now + 0.1);
-                wireGain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-                
-                wireNoise.connect(wireHP);
-                wireHP.connect(wireBP);
-                wireBP.connect(wireGain);
-                
-                // 5. Stick attack (transient)
-                const attackNoise = audioContext.createBufferSource();
-                const attackBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.02, audioContext.sampleRate);
-                const attackData = attackBuffer.getChannelData(0);
-                for (let i = 0; i < attackBuffer.length; i++) {
-                    attackData[i] = (Math.random() * 2 - 1) * (1 - i / attackBuffer.length);
-                }
-                attackNoise.buffer = attackBuffer;
-                
-                const attackFilter = audioContext.createBiquadFilter();
-                attackFilter.type = 'lowpass';
-                attackFilter.frequency.value = 3000;
-                
-                const attackGain = audioContext.createGain();
-                attackGain.gain.setValueAtTime(0.6, now);
-                attackGain.gain.exponentialRampToValueAtTime(0.01, now + 0.02);
-                
-                attackNoise.connect(attackFilter);
-                attackFilter.connect(attackGain);
-                
-                // Room ambience
-                const reverb = audioContext.createGain();
-                reverb.gain.value = 0.15;
-                
-                toneGain.connect(reverb);
-                wireGain.connect(reverb);
-                attackGain.connect(reverb);
-                
-                toneGain.connect(audioContext.destination);
-                wireGain.connect(audioContext.destination);
-                attackGain.connect(audioContext.destination);
-                reverb.connect(audioContext.destination);
-                
-                fundamental.start(now);
-                harmonic2.start(now);
-                harmonic3.start(now);
-                wireNoise.start(now);
-                attackNoise.start(now);
-                
-                fundamental.stop(now + 0.2);
-                harmonic2.stop(now + 0.15);
-                harmonic3.stop(now + 0.12);
-                wireNoise.stop(now + 0.25);
-                attackNoise.stop(now + 0.02);
-                
-            } else if (drumType === 'tom1') {
-                // TOM 1 - High acoustic tom (10" or 12")
-                const baseFreq = 220;
-                
-                // Fundamental
+                // 1. Fundamental tones
                 const fund = audioContext.createOscillator();
                 fund.type = 'sine';
-                fund.frequency.setValueAtTime(baseFreq, now);
-                fund.frequency.exponentialRampToValueAtTime(baseFreq * 0.85, now + 0.1);
-                fund.frequency.exponentialRampToValueAtTime(baseFreq * 0.75, now + 0.3);
-                fund.frequency.exponentialRampToValueAtTime(baseFreq * 0.65, now + 0.5);
+                fund.frequency.setValueAtTime(200, now);
+                fund.frequency.exponentialRampToValueAtTime(160, now + 0.15);
                 
-                // Overtone 1
-                const ov1 = audioContext.createOscillator();
-                ov1.type = 'sine';
-                ov1.frequency.setValueAtTime(baseFreq * 1.6, now);
-                ov1.frequency.exponentialRampToValueAtTime(baseFreq * 1.4, now + 0.15);
-                ov1.frequency.exponentialRampToValueAtTime(baseFreq * 1.2, now + 0.35);
+                const harm2 = audioContext.createOscillator();
+                harm2.type = 'sine';
+                harm2.frequency.setValueAtTime(330, now);
+                harm2.frequency.exponentialRampToValueAtTime(280, now + 0.1);
                 
-                // Overtone 2
-                const ov2 = audioContext.createOscillator();
-                ov2.type = 'sine';
-                ov2.frequency.setValueAtTime(baseFreq * 2.3, now);
-                ov2.frequency.exponentialRampToValueAtTime(baseFreq * 2.0, now + 0.12);
-                ov2.frequency.exponentialRampToValueAtTime(baseFreq * 1.7, now + 0.25);
+                const toneGain = audioContext.createGain();
+                toneGain.gain.setValueAtTime(0.6, now);
+                toneGain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
                 
-                // Shell
-                const shell = audioContext.createOscillator();
-                shell.type = 'triangle';
-                shell.frequency.setValueAtTime(baseFreq * 0.8, now);
-                shell.frequency.exponentialRampToValueAtTime(baseFreq * 0.6, now + 0.4);
+                fund.connect(toneGain);
+                harm2.connect(toneGain);
+                toneGain.connect(audioContext.destination);
                 
-                // Attack
+                // 2. Snare wires
+                const wire = audioContext.createBufferSource();
+                const wireBuf = audioContext.createBuffer(1, audioContext.sampleRate * 0.2, audioContext.sampleRate);
+                const wireData = wireBuf.getChannelData(0);
+                for (let i = 0; i < wireBuf.length; i++) {
+                    wireData[i] = (Math.random() * 2 - 1) * Math.exp(-i / audioContext.sampleRate * 12);
+                }
+                wire.buffer = wireBuf;
+                
+                const wireFilt = audioContext.createBiquadFilter();
+                wireFilt.type = 'highpass';
+                wireFilt.frequency.value = 2000;
+                
+                const wireGain = audioContext.createGain();
+                wireGain.gain.setValueAtTime(0.8, now);
+                wireGain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                
+                wire.connect(wireFilt);
+                wireFilt.connect(wireGain);
+                wireGain.connect(audioContext.destination);
+                
+                // 3. Attack
                 const att = audioContext.createBufferSource();
-                const attBuf = audioContext.createBuffer(1, audioContext.sampleRate * 0.03, audioContext.sampleRate);
+                const attBuf = audioContext.createBuffer(1, audioContext.sampleRate * 0.015, audioContext.sampleRate);
                 const attData = attBuf.getChannelData(0);
                 for (let i = 0; i < attBuf.length; i++) {
-                    const env = 1 - (i / attBuf.length);
-                    attData[i] = (Math.random() * 2 - 1) * env * env;
+                    attData[i] = (Math.random() * 2 - 1) * (1 - i / attBuf.length);
                 }
                 att.buffer = attBuf;
                 
-                const attFilt = audioContext.createBiquadFilter();
-                attFilt.type = 'lowpass';
-                attFilt.frequency.value = 1200;
-                
                 const attGain = audioContext.createGain();
                 attGain.gain.setValueAtTime(0.5, now);
-                attGain.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
+                attGain.gain.exponentialRampToValueAtTime(0.01, now + 0.015);
                 
-                att.connect(attFilt);
-                attFilt.connect(attGain);
+                att.connect(attGain);
+                attGain.connect(audioContext.destination);
                 
-                // Main gain
+                // Start all
+                fund.start(now);
+                harm2.start(now);
+                wire.start(now);
+                att.start(now);
+                
+                fund.stop(now + 0.18);
+                harm2.stop(now + 0.15);
+                wire.stop(now + 0.2);
+                att.stop(now + 0.015);
+                
+            } else if (drumType === 'tom1') {
+                // TOM 1 - Independent nodes for each hit
+                const baseFreq = 220;
+                
+                const fund = audioContext.createOscillator();
+                fund.type = 'sine';
+                fund.frequency.setValueAtTime(baseFreq, now);
+                fund.frequency.exponentialRampToValueAtTime(baseFreq * 0.7, now + 0.4);
+                
+                const ov1 = audioContext.createOscillator();
+                ov1.type = 'sine';
+                ov1.frequency.setValueAtTime(baseFreq * 1.6, now);
+                ov1.frequency.exponentialRampToValueAtTime(baseFreq * 1.2, now + 0.3);
+                
+                const ov2 = audioContext.createOscillator();
+                ov2.type = 'sine';
+                ov2.frequency.setValueAtTime(baseFreq * 2.3, now);
+                ov2.frequency.exponentialRampToValueAtTime(baseFreq * 1.7, now + 0.2);
+                
+                const att = audioContext.createBufferSource();
+                const attBuf = audioContext.createBuffer(1, audioContext.sampleRate * 0.02, audioContext.sampleRate);
+                const attData = attBuf.getChannelData(0);
+                for (let i = 0; i < attBuf.length; i++) {
+                    attData[i] = (Math.random() * 2 - 1) * (1 - i / attBuf.length) * 0.8;
+                }
+                att.buffer = attBuf;
+                
+                const attGain = audioContext.createGain();
+                attGain.gain.setValueAtTime(0.6, now);
+                attGain.gain.exponentialRampToValueAtTime(0.01, now + 0.02);
+                
+                att.connect(attGain);
+                attGain.connect(audioContext.destination);
+                
                 const mainGain = audioContext.createGain();
                 mainGain.gain.setValueAtTime(0, now);
-                mainGain.gain.linearRampToValueAtTime(0.85, now + 0.005);
-                mainGain.gain.setValueAtTime(0.75, now + 0.02);
-                mainGain.gain.exponentialRampToValueAtTime(0.5, now + 0.1);
-                mainGain.gain.exponentialRampToValueAtTime(0.2, now + 0.3);
-                mainGain.gain.exponentialRampToValueAtTime(0.05, now + 0.5);
-                mainGain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+                mainGain.gain.linearRampToValueAtTime(0.9, now + 0.003);
+                mainGain.gain.exponentialRampToValueAtTime(0.5, now + 0.08);
+                mainGain.gain.exponentialRampToValueAtTime(0.1, now + 0.3);
+                mainGain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
                 
-                const g1 = audioContext.createGain();
-                g1.gain.value = 1.0;
-                const g2 = audioContext.createGain();
-                g2.gain.value = 0.4;
-                const g3 = audioContext.createGain();
-                g3.gain.value = 0.2;
-                const g4 = audioContext.createGain();
-                g4.gain.value = 0.3;
-                
-                fund.connect(g1);
-                ov1.connect(g2);
-                ov2.connect(g3);
-                shell.connect(g4);
-                
-                g1.connect(mainGain);
-                g2.connect(mainGain);
-                g3.connect(mainGain);
-                g4.connect(mainGain);
-                
-                const rev = audioContext.createGain();
-                rev.gain.value = 0.12;
-                
-                mainGain.connect(rev);
+                fund.connect(mainGain);
+                ov1.connect(mainGain);
+                ov2.connect(mainGain);
                 mainGain.connect(audioContext.destination);
-                rev.connect(audioContext.destination);
-                attGain.connect(audioContext.destination);
                 
                 fund.start(now);
                 ov1.start(now);
                 ov2.start(now);
-                shell.start(now);
                 att.start(now);
                 
-                fund.stop(now + 0.7);
-                ov1.stop(now + 0.5);
-                ov2.stop(now + 0.35);
-                shell.stop(now + 0.6);
-                att.stop(now + 0.03);
+                fund.stop(now + 0.5);
+                ov1.stop(now + 0.4);
+                ov2.stop(now + 0.3);
+                att.stop(now + 0.02);
                 
             } else if (drumType === 'tom2') {
-                // TOM 2 - Mid acoustic tom (13" or 14")
+                // TOM 2 - Independent nodes
                 const baseFreq = 165;
                 
                 const fund = audioContext.createOscillator();
                 fund.type = 'sine';
                 fund.frequency.setValueAtTime(baseFreq, now);
-                fund.frequency.exponentialRampToValueAtTime(baseFreq * 0.85, now + 0.1);
-                fund.frequency.exponentialRampToValueAtTime(baseFreq * 0.75, now + 0.3);
-                fund.frequency.exponentialRampToValueAtTime(baseFreq * 0.65, now + 0.5);
+                fund.frequency.exponentialRampToValueAtTime(baseFreq * 0.7, now + 0.4);
                 
                 const ov1 = audioContext.createOscillator();
                 ov1.type = 'sine';
                 ov1.frequency.setValueAtTime(baseFreq * 1.6, now);
-                ov1.frequency.exponentialRampToValueAtTime(baseFreq * 1.4, now + 0.15);
-                ov1.frequency.exponentialRampToValueAtTime(baseFreq * 1.2, now + 0.35);
+                ov1.frequency.exponentialRampToValueAtTime(baseFreq * 1.2, now + 0.3);
                 
                 const ov2 = audioContext.createOscillator();
                 ov2.type = 'sine';
                 ov2.frequency.setValueAtTime(baseFreq * 2.3, now);
-                ov2.frequency.exponentialRampToValueAtTime(baseFreq * 2.0, now + 0.12);
-                ov2.frequency.exponentialRampToValueAtTime(baseFreq * 1.7, now + 0.25);
-                
-                const shell = audioContext.createOscillator();
-                shell.type = 'triangle';
-                shell.frequency.setValueAtTime(baseFreq * 0.8, now);
-                shell.frequency.exponentialRampToValueAtTime(baseFreq * 0.6, now + 0.4);
+                ov2.frequency.exponentialRampToValueAtTime(baseFreq * 1.7, now + 0.2);
                 
                 const att = audioContext.createBufferSource();
-                const attBuf = audioContext.createBuffer(1, audioContext.sampleRate * 0.03, audioContext.sampleRate);
+                const attBuf = audioContext.createBuffer(1, audioContext.sampleRate * 0.02, audioContext.sampleRate);
                 const attData = attBuf.getChannelData(0);
                 for (let i = 0; i < attBuf.length; i++) {
-                    const env = 1 - (i / attBuf.length);
-                    attData[i] = (Math.random() * 2 - 1) * env * env;
+                    attData[i] = (Math.random() * 2 - 1) * (1 - i / attBuf.length) * 0.8;
                 }
                 att.buffer = attBuf;
                 
-                const attFilt = audioContext.createBiquadFilter();
-                attFilt.type = 'lowpass';
-                attFilt.frequency.value = 1200;
-                
                 const attGain = audioContext.createGain();
-                attGain.gain.setValueAtTime(0.5, now);
-                attGain.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
+                attGain.gain.setValueAtTime(0.6, now);
+                attGain.gain.exponentialRampToValueAtTime(0.01, now + 0.02);
                 
-                att.connect(attFilt);
-                attFilt.connect(attGain);
+                att.connect(attGain);
+                attGain.connect(audioContext.destination);
                 
                 const mainGain = audioContext.createGain();
                 mainGain.gain.setValueAtTime(0, now);
-                mainGain.gain.linearRampToValueAtTime(0.85, now + 0.005);
-                mainGain.gain.setValueAtTime(0.75, now + 0.02);
-                mainGain.gain.exponentialRampToValueAtTime(0.5, now + 0.1);
-                mainGain.gain.exponentialRampToValueAtTime(0.2, now + 0.3);
-                mainGain.gain.exponentialRampToValueAtTime(0.05, now + 0.5);
-                mainGain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+                mainGain.gain.linearRampToValueAtTime(0.9, now + 0.003);
+                mainGain.gain.exponentialRampToValueAtTime(0.5, now + 0.08);
+                mainGain.gain.exponentialRampToValueAtTime(0.1, now + 0.3);
+                mainGain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
                 
-                const g1 = audioContext.createGain();
-                g1.gain.value = 1.0;
-                const g2 = audioContext.createGain();
-                g2.gain.value = 0.4;
-                const g3 = audioContext.createGain();
-                g3.gain.value = 0.2;
-                const g4 = audioContext.createGain();
-                g4.gain.value = 0.3;
-                
-                fund.connect(g1);
-                ov1.connect(g2);
-                ov2.connect(g3);
-                shell.connect(g4);
-                
-                g1.connect(mainGain);
-                g2.connect(mainGain);
-                g3.connect(mainGain);
-                g4.connect(mainGain);
-                
-                const rev = audioContext.createGain();
-                rev.gain.value = 0.12;
-                
-                mainGain.connect(rev);
+                fund.connect(mainGain);
+                ov1.connect(mainGain);
+                ov2.connect(mainGain);
                 mainGain.connect(audioContext.destination);
-                rev.connect(audioContext.destination);
-                attGain.connect(audioContext.destination);
                 
                 fund.start(now);
                 ov1.start(now);
                 ov2.start(now);
-                shell.start(now);
                 att.start(now);
                 
-                fund.stop(now + 0.7);
-                ov1.stop(now + 0.5);
-                ov2.stop(now + 0.35);
-                shell.stop(now + 0.6);
-                att.stop(now + 0.03);
+                fund.stop(now + 0.5);
+                ov1.stop(now + 0.4);
+                ov2.stop(now + 0.3);
+                att.stop(now + 0.02);
                 
             } else if (drumType === 'tom3') {
-                // TOM 3 - Floor tom (16" or 18")
+                // TOM 3 - Independent nodes
                 const baseFreq = 110;
                 
                 const fund = audioContext.createOscillator();
                 fund.type = 'sine';
                 fund.frequency.setValueAtTime(baseFreq, now);
-                fund.frequency.exponentialRampToValueAtTime(baseFreq * 0.85, now + 0.1);
-                fund.frequency.exponentialRampToValueAtTime(baseFreq * 0.75, now + 0.3);
-                fund.frequency.exponentialRampToValueAtTime(baseFreq * 0.65, now + 0.5);
+                fund.frequency.exponentialRampToValueAtTime(baseFreq * 0.7, now + 0.4);
                 
                 const ov1 = audioContext.createOscillator();
                 ov1.type = 'sine';
                 ov1.frequency.setValueAtTime(baseFreq * 1.6, now);
-                ov1.frequency.exponentialRampToValueAtTime(baseFreq * 1.4, now + 0.15);
-                ov1.frequency.exponentialRampToValueAtTime(baseFreq * 1.2, now + 0.35);
+                ov1.frequency.exponentialRampToValueAtTime(baseFreq * 1.2, now + 0.3);
                 
                 const ov2 = audioContext.createOscillator();
                 ov2.type = 'sine';
                 ov2.frequency.setValueAtTime(baseFreq * 2.3, now);
-                ov2.frequency.exponentialRampToValueAtTime(baseFreq * 2.0, now + 0.12);
-                ov2.frequency.exponentialRampToValueAtTime(baseFreq * 1.7, now + 0.25);
-                
-                const shell = audioContext.createOscillator();
-                shell.type = 'triangle';
-                shell.frequency.setValueAtTime(baseFreq * 0.8, now);
-                shell.frequency.exponentialRampToValueAtTime(baseFreq * 0.6, now + 0.4);
+                ov2.frequency.exponentialRampToValueAtTime(baseFreq * 1.7, now + 0.2);
                 
                 const att = audioContext.createBufferSource();
-                const attBuf = audioContext.createBuffer(1, audioContext.sampleRate * 0.03, audioContext.sampleRate);
+                const attBuf = audioContext.createBuffer(1, audioContext.sampleRate * 0.02, audioContext.sampleRate);
                 const attData = attBuf.getChannelData(0);
                 for (let i = 0; i < attBuf.length; i++) {
-                    const env = 1 - (i / attBuf.length);
-                    attData[i] = (Math.random() * 2 - 1) * env * env;
+                    attData[i] = (Math.random() * 2 - 1) * (1 - i / attBuf.length) * 0.8;
                 }
                 att.buffer = attBuf;
                 
-                const attFilt = audioContext.createBiquadFilter();
-                attFilt.type = 'lowpass';
-                attFilt.frequency.value = 1200;
-                
                 const attGain = audioContext.createGain();
-                attGain.gain.setValueAtTime(0.5, now);
-                attGain.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
+                attGain.gain.setValueAtTime(0.6, now);
+                attGain.gain.exponentialRampToValueAtTime(0.01, now + 0.02);
                 
-                att.connect(attFilt);
-                attFilt.connect(attGain);
+                att.connect(attGain);
+                attGain.connect(audioContext.destination);
                 
                 const mainGain = audioContext.createGain();
                 mainGain.gain.setValueAtTime(0, now);
-                mainGain.gain.linearRampToValueAtTime(0.85, now + 0.005);
-                mainGain.gain.setValueAtTime(0.75, now + 0.02);
-                mainGain.gain.exponentialRampToValueAtTime(0.5, now + 0.1);
-                mainGain.gain.exponentialRampToValueAtTime(0.2, now + 0.3);
-                mainGain.gain.exponentialRampToValueAtTime(0.05, now + 0.5);
-                mainGain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+                mainGain.gain.linearRampToValueAtTime(0.9, now + 0.003);
+                mainGain.gain.exponentialRampToValueAtTime(0.5, now + 0.08);
+                mainGain.gain.exponentialRampToValueAtTime(0.1, now + 0.3);
+                mainGain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
                 
-                const g1 = audioContext.createGain();
-                g1.gain.value = 1.0;
-                const g2 = audioContext.createGain();
-                g2.gain.value = 0.4;
-                const g3 = audioContext.createGain();
-                g3.gain.value = 0.2;
-                const g4 = audioContext.createGain();
-                g4.gain.value = 0.3;
-                
-                fund.connect(g1);
-                ov1.connect(g2);
-                ov2.connect(g3);
-                shell.connect(g4);
-                
-                g1.connect(mainGain);
-                g2.connect(mainGain);
-                g3.connect(mainGain);
-                g4.connect(mainGain);
-                
-                const rev = audioContext.createGain();
-                rev.gain.value = 0.12;
-                
-                mainGain.connect(rev);
+                fund.connect(mainGain);
+                ov1.connect(mainGain);
+                ov2.connect(mainGain);
                 mainGain.connect(audioContext.destination);
-                rev.connect(audioContext.destination);
-                attGain.connect(audioContext.destination);
                 
                 fund.start(now);
                 ov1.start(now);
                 ov2.start(now);
-                shell.start(now);
                 att.start(now);
                 
-                fund.stop(now + 0.7);
-                ov1.stop(now + 0.5);
-                ov2.stop(now + 0.35);
-                shell.stop(now + 0.6);
-                att.stop(now + 0.03);
+                fund.stop(now + 0.5);
+                ov1.stop(now + 0.4);
+                ov2.stop(now + 0.3);
+                att.stop(now + 0.02);
             }
         }
 
